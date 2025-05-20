@@ -22,8 +22,19 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    const gardenersCollection = client.db('Leafy').collection('gardeners')
+
+    app.get('/gardeners', async (req, res) => {
+      const result = await gardenersCollection.find().toArray()
+      res.send(result)
+    })
+
+    app.get('/active-gardeners', async (req, res) => {
+      const query = {status: "active"}
+      const result = await gardenersCollection.find(query).toArray()
+      res.send(result)
+    })
+
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 });
     console.log(
