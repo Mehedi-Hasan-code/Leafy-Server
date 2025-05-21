@@ -23,7 +23,8 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const gardenersCollection = client.db('Leafy').collection('gardeners')
-
+    const tipsCollection = client.db('Leafy').collection('tips')
+    // gardeners collection
     app.get('/gardeners', async (req, res) => {
       const result = await gardenersCollection.find().toArray()
       res.send(result)
@@ -31,10 +32,15 @@ async function run() {
 
     app.get('/active-gardeners', async (req, res) => {
       const query = {status: "active"}
-      const result = await gardenersCollection.find(query).toArray()
+      const result = await gardenersCollection.find(query).limit(6).toArray()
       res.send(result)
     })
-
+    // tip collection
+    app.get('/home-tips', async (req, res) => {
+      const query = { availability: "Public" }
+      const result = await tipsCollection.find(query).limit(6).toArray()
+      res.send(result)
+    })
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 });
     console.log(
