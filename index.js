@@ -36,6 +36,21 @@ async function run() {
       res.send(result)
     })
     // tip collection
+
+    // all tips
+    app.get('/tips', async (req, res) => {
+      const result = await tipsCollection.find().toArray()
+      res.send(result)
+    })
+
+    // public tips
+    app.get('/public-tips', async (req, res) => {
+      const query = { availability: "Public" }
+      const result = await tipsCollection.find(query).toArray()
+      res.send(result)
+    })
+
+    // 6 tips
     app.get('/home-tips', async (req, res) => {
       const query = { availability: "Public" }
       const result = await tipsCollection.find(query).limit(6).toArray()
