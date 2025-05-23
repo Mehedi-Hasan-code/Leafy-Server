@@ -43,6 +43,12 @@ async function run() {
       res.send(result)
     })
 
+    app.post('/tips', async (req, res) => {
+      const tipObj = req.body
+      const result = await tipsCollection.insertOne(tipObj)
+      res.send(result)
+    })
+
     // public tips
     app.get('/public-tips', async (req, res) => {
       const query = { availability: "Public" }
