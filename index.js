@@ -42,6 +42,13 @@ async function run() {
       const result = await tipsCollection.find().toArray()
       res.send(result)
     })
+    // my tips
+    app.get('/my-tips/:email', async (req, res) => {
+      const email = req.params.email
+      const query = {userEmail: email}
+      const result = await tipsCollection.find(query).toArray()
+      res.send(result)
+    })
 
     app.post('/tips', async (req, res) => {
       const tipObj = req.body
