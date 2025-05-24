@@ -22,19 +22,27 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    // collections
     const gardenersCollection = client.db('Leafy').collection('gardeners');
     const tipsCollection = client.db('Leafy').collection('tips');
+
     // gardeners collection
+
+    // get gardeners
     app.get('/gardeners', async (req, res) => {
       const result = await gardenersCollection.find().toArray();
       res.send(result);
     });
 
+    // get active gardeners
     app.get('/active-gardeners', async (req, res) => {
       const query = { status: 'active' };
       const result = await gardenersCollection.find(query).limit(6).toArray();
       res.send(result);
     });
+
+
+
     // tip collection
 
     // all tips
@@ -42,6 +50,7 @@ async function run() {
       const result = await tipsCollection.find().toArray();
       res.send(result);
     });
+
     // single tip
     app.get('/tip/:id', async (req, res) => {
       const id = req.params.id;
@@ -62,6 +71,14 @@ async function run() {
       res.send(result);
     });
 
+    // delete tip
+    app.delete('/tip/:id', async(req, res) => {
+      const id = req.params.id
+      const query = {_id: new ObjectId(id)}
+      const result = await tipsCollection.deleteOne(query)
+      res.send(result)
+    })
+
     // my tips
     app.get('/my-tips/:email', async (req, res) => {
       const email = req.params.email;
@@ -70,6 +87,7 @@ async function run() {
       res.send(result);
     });
 
+    // post tips
     app.post('/tips', async (req, res) => {
       const tipObj = req.body;
       const result = await tipsCollection.insertOne(tipObj);
@@ -89,6 +107,8 @@ async function run() {
       const result = await tipsCollection.find(query).limit(6).toArray();
       res.send(result);
     });
+
+    
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 });
     console.log(
