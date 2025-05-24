@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -22,53 +22,73 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    const gardenersCollection = client.db('Leafy').collection('gardeners')
-    const tipsCollection = client.db('Leafy').collection('tips')
+    const gardenersCollection = client.db('Leafy').collection('gardeners');
+    const tipsCollection = client.db('Leafy').collection('tips');
     // gardeners collection
     app.get('/gardeners', async (req, res) => {
-      const result = await gardenersCollection.find().toArray()
-      res.send(result)
-    })
+      const result = await gardenersCollection.find().toArray();
+      res.send(result);
+    });
 
     app.get('/active-gardeners', async (req, res) => {
-      const query = {status: "active"}
-      const result = await gardenersCollection.find(query).limit(6).toArray()
-      res.send(result)
-    })
+      const query = { status: 'active' };
+      const result = await gardenersCollection.find(query).limit(6).toArray();
+      res.send(result);
+    });
     // tip collection
 
     // all tips
     app.get('/tips', async (req, res) => {
-      const result = await tipsCollection.find().toArray()
-      res.send(result)
-    })
+      const result = await tipsCollection.find().toArray();
+      res.send(result);
+    });
+    // single tip
+    app.get('/tip/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await tipsCollection.findOne(query);
+      res.send(result);
+    });
+
+    // update tip
+    app.put('/tip/:id', async (req, res) => {
+      const id = req.params.id
+      const updateData = req.body;
+      const query = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: updateData,
+      };
+      const result = await tipsCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
     // my tips
     app.get('/my-tips/:email', async (req, res) => {
-      const email = req.params.email
-      const query = {userEmail: email}
-      const result = await tipsCollection.find(query).toArray()
-      res.send(result)
-    })
+      const email = req.params.email;
+      const query = { userEmail: email };
+      const result = await tipsCollection.find(query).toArray();
+      res.send(result);
+    });
 
     app.post('/tips', async (req, res) => {
-      const tipObj = req.body
-      const result = await tipsCollection.insertOne(tipObj)
-      res.send(result)
-    })
+      const tipObj = req.body;
+      const result = await tipsCollection.insertOne(tipObj);
+      res.send(result);
+    });
 
     // public tips
     app.get('/public-tips', async (req, res) => {
-      const query = { availability: "Public" }
-      const result = await tipsCollection.find(query).toArray()
-      res.send(result)
-    })
+      const query = { availability: 'Public' };
+      const result = await tipsCollection.find(query).toArray();
+      res.send(result);
+    });
 
     // 6 tips
     app.get('/home-tips', async (req, res) => {
-      const query = { availability: "Public" }
-      const result = await tipsCollection.find(query).limit(6).toArray()
-      res.send(result)
-    })
+      const query = { availability: 'Public' };
+      const result = await tipsCollection.find(query).limit(6).toArray();
+      res.send(result);
+    });
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 });
     console.log(
