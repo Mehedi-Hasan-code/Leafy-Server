@@ -71,6 +71,18 @@ async function run() {
       res.send(result);
     });
 
+    // update likes
+    app.patch('/tip/:id', async (req, res) => {
+      const id = req.params.id
+      const likes = req.body;
+      const query = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: likes,
+      };
+      const result = await tipsCollection.updateOne(query, updateDoc);
+      res.send(result);
+    })
+
     // delete tip
     app.delete('/tip/:id', async(req, res) => {
       const id = req.params.id
@@ -110,10 +122,10 @@ async function run() {
 
     
     // Send a ping to confirm a successful connection
-    await client.db('admin').command({ ping: 1 });
-    console.log(
-      'Pinged your deployment. You successfully connected to MongoDB!'
-    );
+    // await client.db('admin').command({ ping: 1 });
+    // console.log(
+    //   'Pinged your deployment. You successfully connected to MongoDB!'
+    // );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
